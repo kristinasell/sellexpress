@@ -36,3 +36,23 @@ class RepairOrderStatusSerializer(serializers.ModelSerializer):
             'created_at'
         ]
         read_only_fields = fields
+
+class ManagerOrderUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RepairOrder
+        fields = [
+            'job_titles',
+            'main_jobs',
+            'additional_jobs',
+            'before_photos',
+            'job_period_start',
+            'job_period_end',
+            'completed_jobs',
+            'job_total_cost',
+            'invoice_info',
+            'payment_status',
+            'after_photos',
+            'estimated_cost',
+            'estimated_completion',
+            'status'
+        ]

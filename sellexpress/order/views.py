@@ -1,5 +1,6 @@
 from django.http import JsonResponse, HttpResponse
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from .models import RepairOrder
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -36,6 +37,22 @@ def get_order_status(request, order_number):
             status=status.HTTP_404_NOT_FOUND
         )
 
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])  # только авторизованные
+def manage_order_details(request, order_number):
+    try:
+        order = RepairOrder.objects.get(order_number=order_number)
+    except RepairOrder.DoesNotExist:
+        return Response({'error': 'Заказ не найден'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ManagerOrderUpdateSerializer(order, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': 'Информация по заказу успешно обновлена'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 # Главная страница
 def index(request):    
     return HttpResponse('Sellexpress')
@@ -52,3 +69,5 @@ def invert_zero_one(request):
         response = 'Только 0 или 1!'
     
     return JsonResponse({'result': response})
+
+
